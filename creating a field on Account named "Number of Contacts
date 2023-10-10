@@ -1,0 +1,30 @@
+public with sharing class CombinedController {
+    
+    @AuraEnabled(cacheable=true)
+    public static List<Account> getRecentAccounts() {
+        return [SELECT Id, Name, CreatedDate FROM Account ORDER BY CreatedDate DESC LIMIT 10];
+    }
+
+    public static void updateNumberOfContacts(List<Contact> contacts) {
+        Set<Id> accountIdsToUpdate = new Set<Id>();
+
+        for (Contact contact : contacts) {
+            accountIdsToUpdate.add(contact.AccountId);
+        }
+
+        if (!accountIdsToUpdate.isEmpty()) {
+            List<Account> accountsToUpdate = new List<Account>();
+
+            for (Id accountId : accountIdsToUpdate) {
+                Account acc = new Account(
+                    Id = accountId,
+                    Number_of_Contacts__c = [SELECT COUNT() FROM Contact WHERE AccountId = :accountId];
+                );
+
+                accountsToUpdate.add(acc);
+            }
+
+            update accountsToUpdate;
+        }
+    }
+}

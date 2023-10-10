@@ -1,0 +1,18 @@
+public with sharing class HttpCalloutExample {
+    public void makeHttpCallout() {
+        HttpRequest request = new HttpRequest();
+        HttpResponse response = new HttpResponse();
+
+        request.setEndpoint('https://postman-echo.com/get?foo1=bar1&foo2=bar2');
+        request.setMethod('GET');
+
+        Http http = new Http();
+        
+        try {
+            response = http.send(request);
+            System.debug('HTTP Response: ' + response.getBody());
+        } catch (Exception e) {
+            System.debug('Exception: ' + e.getMessage());
+        }
+    }
+}
